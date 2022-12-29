@@ -2,6 +2,10 @@
 
 namespace Database\Factories;
 
+use App\Models\{
+    Maintenance,
+    Vehicle
+};
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class VehicleFactory extends Factory
@@ -35,5 +39,14 @@ class VehicleFactory extends Factory
         $models = json_decode(file_get_contents($url), true);
         
         return $models['modelos'][array_rand($models['modelos'])];
+    }
+
+    public function configure()
+    {
+        return $this->afterCreating(function (Vehicle $vehicle) {
+            Maintenance::factory()->for($vehicle)->count(5)->create([
+                'user_id' => $vehicle->user_id,
+            ]);
+        });
     }
 }
